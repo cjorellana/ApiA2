@@ -21,6 +21,7 @@
             android:layout_height="wrap_content"
             android:text="180 min."
             android:gravity="center"
+            android:layout_marginBottom="8dp"
             />
     </LinearLayout>
     
@@ -37,12 +38,13 @@
         android:text="Titulo"/>
     <TextView
         android:id="@+id/txtRating"
-        android:layout_width="wrap_content"
+        android:layout_width="80dp"
         android:layout_height="wrap_content"
         android:layout_below="@+id/txtTitulo"
         android:layout_toRightOf="@id/imgContainer"
         android:gravity="center"
         android:padding="5dp"
+        android:background="@drawable/rounded_corder"
         android:layout_margin="8dp"
         android:text="PG13"/>
     <TextView
@@ -62,6 +64,8 @@
         android:layout_below="@+id/txtRating"
         android:layout_toRightOf="@id/imgContainer"
         android:singleLine="false"
+        android:layout_marginLeft="8dp"
+        android:layout_marginBottom="8dp"
         android:text="Sinopsis"/>
 
 </RelativeLayout>

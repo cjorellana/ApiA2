@@ -1,17 +1,25 @@
 package gt.vidal.albacinema;
 
+import android.content.Context;
+import android.graphics.Bitmap;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
+import android.support.v7.app.ActionBar;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ArrayAdapter;
 import android.widget.BaseAdapter;
+import android.widget.ImageView;
 import android.widget.ListView;
+import android.widget.Spinner;
 import android.widget.TextView;
 
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
+
+import org.w3c.dom.Text;
 
 import java.util.ArrayList;
 
@@ -36,6 +44,7 @@ public class PeliculasCineFragment extends BaseFragment
     {
         view = inflater.inflate(R.layout.fragment_peliculas_cine, container, false);
         lstPeliculas = (ListView) view.findViewById(R.id.lstPeliculas);
+        ((TextView)view.findViewById(R.id.txtHeader)).setText(titulo);
         return view;
     }
 
@@ -93,7 +102,21 @@ public class PeliculasCineFragment extends BaseFragment
 
     private void llenarFechas()
     {
-        
+        getBaseActivity().getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+        getBaseActivity().getSupportActionBar().setDisplayShowCustomEnabled(true);
+        LayoutInflater inflator = (LayoutInflater) getActivity().getSystemService(Context.LAYOUT_INFLATER_SERVICE);
+        View vi = inflator.inflate(R.layout.spinner_toolbar, null);
+        Spinner s = (Spinner) vi.findViewById(R.id.spin);
+        ArrayList<String> spinnerlist = new ArrayList<String>();
+        spinnerlist.add("Meow");
+        spinnerlist.add("Waff");
+        ArrayAdapter<String> spinneradapter = new ArrayAdapter<String>(getActivity(), android.R.layout.simple_dropdown_item_1line, spinnerlist);
+
+        s.setAdapter(spinneradapter);
+
+        getBaseActivity().getSupportActionBar().setCustomView(vi);
+
+        spinneradapter.notifyDataSetChanged();
     }
 
     class PeliculasAdapter extends BaseAdapter
@@ -152,6 +175,14 @@ public class PeliculasCineFragment extends BaseFragment
             }
 
             ((TextView) v.findViewById(R.id.txtSinopsis)).setText(sinopsis);
+            final View tv = v;
+
+            String imgurl = pelicula.get("Url").getAsString();
+            new BackgroundTask<Bitmap>(() -> Images.get(imgurl), (b, e) ->
+            {
+                if (e != null) throw new RuntimeException(e);
+                ((ImageView)tv.findViewById(R.id.imgPelicula)).setImageBitmap(b);
+            }).execute();
 
             return v;
         }

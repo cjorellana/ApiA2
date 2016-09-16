@@ -29,12 +29,7 @@ public class MainActivity extends BaseActivity
         super.onCreate(savedInstanceState);
 
         Api.instance = new Api("https://ccn.albacinema.com.gt");
-
-        new BackgroundTask<JsonElement>(() -> Api.instance.getJson("/urlimg"), (j, e) ->
-        {
-
-            Images.imagesApi = new Api(j.getAsString());
-        }).execute();
+        Images.init();
 
         setContentView(R.layout.activity_main);
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);

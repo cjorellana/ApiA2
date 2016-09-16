@@ -1,5 +1,7 @@
 package gt.vidal.albacinema;
 
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.util.Log;
 
 import com.google.gson.Gson;
@@ -51,4 +53,14 @@ public class Api
         return parser.parse(chaine.toString());
     }
 
+    public Bitmap getImage(String name) throws Exception
+    {
+        URL url = new URL(this.url + name);
+        HttpURLConnection connection = (HttpURLConnection)url.openConnection();
+        connection.setDoInput(true);
+        connection.connect();
+        InputStream input = connection.getInputStream();
+        Bitmap myBitmap = BitmapFactory.decodeStream(input);
+        return myBitmap;
+    }
 }
