@@ -99,7 +99,11 @@ public class PeliculasCineFragment extends BaseFragment
 
     private void onItemSelected(int position)
     {
-
+        PeliculaFragment f = new PeliculaFragment();
+        f.pelicula = peliculas.get(position).getAsJsonObject();
+        f.fecha = fechas.get(fechaSeleccionada);
+        f.cineId = cineID;
+        getBaseActivity().changeFragment(f);
     }
 
     private void llenarFechas()
@@ -176,9 +180,10 @@ public class PeliculasCineFragment extends BaseFragment
 
             String sinopsis = pelicula.get("Sinopsis").getAsString();
 
-            if (sinopsis.length() > 100)
+            int maxlength = 100;
+            if (sinopsis.length() > maxlength)
             {
-                sinopsis = sinopsis.substring(0, 100);
+                sinopsis = sinopsis.substring(0, maxlength);
                 int lastSpace = sinopsis.lastIndexOf(' ');
                 if (lastSpace > 0)
                     sinopsis = sinopsis.substring(0, lastSpace);
