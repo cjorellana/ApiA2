@@ -8,6 +8,7 @@ import android.support.v7.app.ActionBar;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.BaseAdapter;
 import android.widget.ImageView;
@@ -34,6 +35,7 @@ public class PeliculasCineFragment extends BaseFragment
 
     View view;
     ListView lstPeliculas;
+    Spinner spinnerFechas;
     ArrayList<String> fechas = new ArrayList<>();
     int fechaSeleccionada = 0;
     private boolean bistro;
@@ -102,21 +104,30 @@ public class PeliculasCineFragment extends BaseFragment
 
     private void llenarFechas()
     {
-        getBaseActivity().getSupportActionBar().setDisplayHomeAsUpEnabled(true);
         getBaseActivity().getSupportActionBar().setDisplayShowCustomEnabled(true);
-        LayoutInflater inflator = (LayoutInflater) getActivity().getSystemService(Context.LAYOUT_INFLATER_SERVICE);
-        View vi = inflator.inflate(R.layout.spinner_toolbar, null);
-        Spinner s = (Spinner) vi.findViewById(R.id.spin);
-        ArrayList<String> spinnerlist = new ArrayList<String>();
-        spinnerlist.add("Meow");
-        spinnerlist.add("Waff");
-        ArrayAdapter<String> spinneradapter = new ArrayAdapter<String>(getActivity(), android.R.layout.simple_dropdown_item_1line, spinnerlist);
-
-        s.setAdapter(spinneradapter);
-
+        LayoutInflater inflater = (LayoutInflater) getActivity().getSystemService(Context.LAYOUT_INFLATER_SERVICE);
+        View vi = inflater.inflate(R.layout.spinner_toolbar, null);
+        spinnerFechas = (Spinner) vi.findViewById(R.id.spin);
+        ArrayAdapter<String> spinneradapter = new ArrayAdapter<>(getActivity(), android.R.layout.simple_dropdown_item_1line, fechas);
+        spinnerFechas.setAdapter(spinneradapter);
         getBaseActivity().getSupportActionBar().setCustomView(vi);
-
         spinneradapter.notifyDataSetChanged();
+
+        spinnerFechas.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener()
+        {
+            @Override
+            public void onItemSelected(AdapterView<?> parent, View view, int position, long id)
+            {
+                fechaSeleccionada = position;
+                fetchPeliculas();
+            }
+
+            @Override
+            public void onNothingSelected(AdapterView<?> parent)
+            {
+
+            }
+        });
     }
 
     class PeliculasAdapter extends BaseAdapter

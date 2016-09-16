@@ -27,5 +27,7 @@ public class BaseActivity extends AppCompatActivity
             fragmentManager.popBackStack(null, FragmentManager.POP_BACK_STACK_INCLUSIVE);
 
         trans.commit ();
+
+        this.setTitle(f.getTitle());
     }
 }

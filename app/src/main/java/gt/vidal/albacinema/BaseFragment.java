@@ -9,4 +9,9 @@ public class BaseFragment extends android.support.v4.app.Fragment
     {
         return (BaseActivity)this.getActivity();
     }
+
+    public String getTitle()
+    {
+        return "";
+    }
 }

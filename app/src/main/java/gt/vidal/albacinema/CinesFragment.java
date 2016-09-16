@@ -66,6 +66,12 @@ public class CinesFragment extends BaseFragment
         lstCines.setOnItemClickListener((parent, view, position, id) -> onItemSelected(position));
     }
 
+    @Override
+    public String getTitle()
+    {
+        return "Cartelera";
+    }
+
     class CinesAdapter extends BaseAdapter
     {
         private final JsonArray data;
