@@ -3,34 +3,33 @@
 
     <group android:checkableBehavior="single">
         <item
-            android:id="@+id/nav_camera"
+            android:id="@+id/nav_cartelera"
             android:icon="@drawable/ic_menu_camera"
-            android:title="Import"/>
+            android:title="Cartelera"/>
         <item
-            android:id="@+id/nav_gallery"
+            android:id="@+id/nav_bistro"
             android:icon="@drawable/ic_menu_gallery"
-            android:title="Gallery"/>
+            android:title="Bistro"/>
         <item
-            android:id="@+id/nav_slideshow"
+            android:id="@+id/nav_estrenos"
             android:icon="@drawable/ic_menu_slideshow"
-            android:title="Slideshow"/>
+            android:title="Estrenos"/>
         <item
-            android:id="@+id/nav_manage"
+            android:id="@+id/nav_proximamente"
             android:icon="@drawable/ic_menu_manage"
-            android:title="Tools"/>
+            android:title="Próximamente"/>
+        <item
+            android:id="@+id/nav_promo"
+            android:icon="@drawable/ic_menu_manage"
+            android:title="Promociones"/>
+        <item
+            android:id="@+id/nav_dulceria"
+            android:icon="@drawable/ic_menu_manage"
+            android:title="Dulcería"/>
+        <item
+            android:id="@+id/nav_ubicaciones"
+            android:icon="@drawable/ic_menu_manage"
+            android:title="Ubicaciones"/>
+
     </group>
-
-    <item android:title="Communicate">
-        <menu>
-            <item
-                android:id="@+id/nav_share"
-                android:icon="@drawable/ic_menu_share"
-                android:title="Share"/>
-            <item
-                android:id="@+id/nav_send"
-                android:icon="@drawable/ic_menu_send"
-                android:title="Send"/>
-        </menu>
-    </item>
-
 </menu>

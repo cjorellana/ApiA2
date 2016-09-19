@@ -30,6 +30,7 @@ public class CinesFragment extends BaseFragment
     View view;
     ListView lstCines;
     JsonArray cines;
+    public boolean bistro;
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState)

@@ -8,12 +8,14 @@ import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentStatePagerAdapter;
 import android.support.v4.view.ViewPager;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.BaseAdapter;
 import android.widget.ImageView;
 import android.widget.ListView;
+import android.widget.RadioButton;
 import android.widget.ScrollView;
 import android.widget.TextView;
 
@@ -22,6 +24,8 @@ import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 
 import java.net.URLEncoder;
+
+import info.hoang8f.android.segmented.SegmentedGroup;
 
 /**
  * Created by alejandroalvarado on 16/09/16.
@@ -74,6 +78,8 @@ public class PeliculaFragment extends BaseFragment
         path.append("?fecha=");
         path.append(fecha);
         path.append(bistro ? "&bistro=1" : "");
+
+        Log.d("meow", path.toString());
 
         new BackgroundTask<JsonArray>(() -> Api.instance.getJson(path.toString()).getAsJsonArray(), (arr, e) ->
         {
@@ -176,14 +182,29 @@ public class PeliculaFragment extends BaseFragment
         public View getView(int position, View convertView, ViewGroup parent)
         {
             View v = convertView;
+            LayoutInflater inflater = getBaseActivity().getLayoutInflater();
 
             if(v == null)
             {
-                LayoutInflater inflater = getBaseActivity().getLayoutInflater();
                 v = inflater.inflate(R.layout.row_horario, parent, false);
             }
 
-            JsonElement horario = (JsonElement) getItem(position);
+            JsonObject horario = ((JsonElement) getItem(position)).getAsJsonObject();
+            ((TextView)v.findViewById(R.id.txtSala)).setText(horario.get("Sala").getAsString());
+            ((TextView)v.findViewById(R.id.txtAtributos))
+                    .setText(horario.get("Attributes").getAsString().replace(";", " | "));
+
+            SegmentedGroup sg = (SegmentedGroup) v.findViewById(R.id.sgmHoras);
+            for (JsonElement h: horario.get("Horas").getAsJsonArray())
+            {
+                RadioButton button = (RadioButton) inflater.inflate(R.layout.segment, null);
+                String hora = h.getAsJsonObject().get("hora").getAsString();
+                hora = hora.substring(0, hora.lastIndexOf(":"));
+                button.setText(hora);
+                button.setEnabled(false);
+                sg.addView(button);
+                sg.updateBackground();
+            }
 
             return v;
         }
