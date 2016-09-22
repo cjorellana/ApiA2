@@ -55,7 +55,13 @@ public class Api
 
     public Bitmap getImage(String name) throws Exception
     {
-        URL url = new URL(this.url + name);
+        return getImage(name, true);
+    }
+
+    public Bitmap getImage(String path, boolean useBaseUrl) throws Exception
+    {
+        String address = useBaseUrl ? this.url + path : path;
+        URL url = new URL(address);
         HttpURLConnection connection = (HttpURLConnection)url.openConnection();
         connection.setDoInput(true);
         connection.connect();

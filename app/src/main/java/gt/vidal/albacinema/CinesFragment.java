@@ -18,6 +18,7 @@ import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 
 import java.io.IOException;
+import java.net.URLEncoder;
 import java.security.KeyStore;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -30,6 +31,7 @@ public class CinesFragment extends BaseFragment
     View view;
     ListView lstCines;
     JsonArray cines;
+    JsonObject peliEstreno;
     public boolean bistro;
 
     @Override
@@ -43,17 +45,32 @@ public class CinesFragment extends BaseFragment
     private void onItemSelected(int position)
     {
         JsonObject cine = cines.get(position).getAsJsonObject();
-        PeliculasCineFragment f = new PeliculasCineFragment();
-        f.cineID = cine.get("ID").getAsInt();
-        f.titulo = cine.get("Name").getAsString();
-        getBaseActivity().changeFragment(f);
+        if (peliEstreno == null)
+        {
+            PeliculasCineFragment f = new PeliculasCineFragment();
+            f.cineID = cine.get("ID").getAsInt();
+            f.titulo = cine.get("Name").getAsString();
+            f.bistro = bistro;
+            getBaseActivity().changeFragment(f);
+        }
+        else
+        {
+            PeliculaFragment f = new PeliculaFragment();
+            f.pelicula = peliEstreno;
+            f.cineId = cine.get("ID").getAsInt();
+            getBaseActivity().changeFragment(f);
+        }
+
     }
 
     @Override
-    public void onViewCreated(View view, @Nullable Bundle savedInstanceState)
+    public void onViewCreated(View view, Bundle savedInstanceState)
     {
         super.onViewCreated(view, savedInstanceState);
-        new BackgroundTask<JsonElement>(() -> Api.instance.getJson("/cines"), (json, exception) ->
+
+        String path = peliEstreno == null ? "/cines" + (bistro ? "/bistro" : "") : "/cines/xpelicula/" + URLEncoder.encode(peliEstreno.get("Name").getAsString());
+
+        new BackgroundTask<JsonElement>(() -> Api.instance.getJson(path), (json, exception) ->
                                         {
                                             if (exception != null) {throw new RuntimeException(exception);}
                                             if (json != null) onInfoFetched(json);

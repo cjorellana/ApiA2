@@ -64,19 +64,20 @@ public class MainActivity extends BaseActivity
             f = new BistroFragment();
         } else if (id == R.id.nav_estrenos)
         {
-
+            f = new EstrenosFragment();
         } else if (id == R.id.nav_proximamente)
         {
-
+            f = new ProximosFragment();
         } else if (id == R.id.nav_promo)
         {
+            f = GalleryFragment.newInstance("/Promociones");
 
         } else if (id == R.id.nav_dulceria)
         {
-
+            f = GalleryFragment.newInstance("/Dulceria");
         } else if (id == R.id.nav_ubicaciones)
         {
-
+            f = new UbicacionesFragment();
         }
 
         changeFragment(f, false);

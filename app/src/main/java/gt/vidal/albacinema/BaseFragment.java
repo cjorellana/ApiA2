@@ -24,6 +24,5 @@ public class BaseFragment extends android.support.v4.app.Fragment
     {
         super.onViewCreated(view, savedInstanceState);
         getBaseActivity().getSupportActionBar().setDisplayShowCustomEnabled(false);
-        setRetainInstance(true);
     }
 }

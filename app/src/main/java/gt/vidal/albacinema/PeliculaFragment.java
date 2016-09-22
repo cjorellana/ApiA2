@@ -1,5 +1,6 @@
 package gt.vidal.albacinema;
 
+import android.content.Context;
 import android.graphics.Bitmap;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
@@ -12,11 +13,14 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.AdapterView;
+import android.widget.ArrayAdapter;
 import android.widget.BaseAdapter;
 import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.RadioButton;
 import android.widget.ScrollView;
+import android.widget.Spinner;
 import android.widget.TextView;
 
 import com.google.gson.JsonArray;
@@ -24,6 +28,7 @@ import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 
 import java.net.URLEncoder;
+import java.util.ArrayList;
 
 import info.hoang8f.android.segmented.SegmentedGroup;
 
@@ -42,7 +47,9 @@ public class PeliculaFragment extends BaseFragment
     private TextView txtHeader;
     private ListView lstHorarios;
     private ScrollView scrSinopsis;
-    private boolean bistro;
+    public boolean bistro;
+    private ArrayList<String> fechas = new ArrayList<>();
+    public boolean estreno;
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState)
@@ -61,12 +68,74 @@ public class PeliculaFragment extends BaseFragment
         super.onViewCreated(view, savedInstanceState);
 
         llenarHeader();
-        setupTabs();
+        if (estreno)
+        {
+            scrSinopsis.setVisibility(View.VISIBLE);
+            lstHorarios.setVisibility(View.GONE);
+            tabLayout.setVisibility(View.GONE);
+            return;
+        }
 
+        setupTabs();
         if (fecha != null)
         {
             fetchHorarios();
         }
+        else
+        {
+            this.estreno = true;
+            fetchFechas();
+        }
+    }
+
+    private void fetchFechas()
+    {
+        StringBuilder path = new StringBuilder("/peliculas/filtrarFechas?idcine=");
+        path.append(cineId);
+        path.append("&pelicula=");
+        path.append(URLEncoder.encode(pelicula.get("Name").getAsString()));
+        new BackgroundTask<JsonElement>(() -> Api.instance.getJson(path.toString()), (json, exception) ->
+        {
+            if (exception != null) {throw new RuntimeException(exception);}
+            if (json != null)
+            {
+                for (JsonElement f : json.getAsJsonArray())
+                {
+                    fechas.add(f.getAsJsonObject().get("fecha").getAsString());
+                }
+
+                llenarFechas();
+                fetchHorarios();
+            }
+        }).execute();
+    }
+
+    private void llenarFechas()
+    {
+        getBaseActivity().getSupportActionBar().setDisplayShowCustomEnabled(true);
+        LayoutInflater inflater = (LayoutInflater) getActivity().getSystemService(Context.LAYOUT_INFLATER_SERVICE);
+        View vi = inflater.inflate(R.layout.spinner_toolbar, null);
+        Spinner spinnerFechas = (Spinner) vi.findViewById(R.id.spin);
+        ArrayAdapter<String> spinneradapter = new ArrayAdapter<>(getActivity(), android.R.layout.simple_dropdown_item_1line, fechas);
+        spinnerFechas.setAdapter(spinneradapter);
+        getBaseActivity().getSupportActionBar().setCustomView(vi);
+        spinneradapter.notifyDataSetChanged();
+
+        spinnerFechas.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener()
+        {
+            @Override
+            public void onItemSelected(AdapterView<?> parent, View view, int position, long id)
+            {
+                fecha = fechas.get(position);
+                fetchHorarios();
+            }
+
+            @Override
+            public void onNothingSelected(AdapterView<?> parent)
+            {
+
+            }
+        });
     }
 
     private void fetchHorarios()

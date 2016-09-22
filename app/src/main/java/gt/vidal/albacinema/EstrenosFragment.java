@@ -2,9 +2,10 @@ package gt.vidal.albacinema;
 
 import android.content.Context;
 import android.graphics.Bitmap;
+import android.net.Uri;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
-import android.support.v7.app.ActionBar;
+import android.support.v4.app.Fragment;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -20,15 +21,16 @@ import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 
-import org.w3c.dom.Text;
-
 import java.util.ArrayList;
 
-/**
- * Created by alejandroalvarado on 14/09/16.
- */
-public class PeliculasCineFragment extends BaseFragment
+
+public class EstrenosFragment extends BaseFragment
 {
+    public EstrenosFragment()
+    {
+
+    }
+
     public int cineID;
     public String titulo;
 
@@ -36,15 +38,12 @@ public class PeliculasCineFragment extends BaseFragment
     View view;
     ListView lstPeliculas;
     Spinner spinnerFechas;
-    ArrayList<String> fechas = new ArrayList<>();
-    int fechaSeleccionada = 0;
     private JsonArray peliculas;
-    public boolean bistro;
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState)
     {
-        view = inflater.inflate(R.layout.fragment_peliculas_cine, container, false);
+        view = inflater.inflate(R.layout.fragment_estrenos, container, false);
         lstPeliculas = (ListView) view.findViewById(R.id.lstPeliculas);
         ((TextView)view.findViewById(R.id.txtHeader)).setText(titulo);
         return view;
@@ -54,36 +53,12 @@ public class PeliculasCineFragment extends BaseFragment
     public void onViewCreated(View view, @Nullable Bundle savedInstanceState)
     {
         super.onViewCreated(view, savedInstanceState);
-        fetchFechas();
-    }
-
-    private void fetchFechas()
-    {
-        new BackgroundTask<JsonElement>(() -> Api.instance.getJson("/peliculas/filtrarFechas?idcine=" + cineID), (json, exception) ->
-        {
-            if (exception != null) {throw new RuntimeException(exception);}
-            if (json != null)
-            {
-                for (JsonElement f : json.getAsJsonArray())
-                {
-                    fechas.add(f.getAsJsonObject().get("fecha").getAsString());
-                }
-
-                llenarFechas();
-                fetchPeliculas();
-            }
-        }).execute();
+        fetchPeliculas();
     }
 
     private void fetchPeliculas()
     {
-        StringBuilder path = new StringBuilder("/peliculas/xcine2/");
-        path.append(cineID);
-        path.append("?fecha=");
-        path.append(fechas.get(fechaSeleccionada));
-        path.append(bistro ? "&bistro=1" : "");
-
-        new BackgroundTask<JsonElement>(() -> Api.instance.getJson(path.toString()), (json, exception) ->
+        new BackgroundTask<JsonElement>(() -> Api.instance.getJson("/peliculas/estrenos"), (json, exception) ->
         {
             if (exception != null) {throw new RuntimeException(exception);}
             if (json != null) onPeliculasFetched(json);
@@ -99,41 +74,11 @@ public class PeliculasCineFragment extends BaseFragment
 
     private void onItemSelected(int position)
     {
-        PeliculaFragment f = new PeliculaFragment();
-        f.pelicula = peliculas.get(position).getAsJsonObject();
-        f.fecha = fechas.get(fechaSeleccionada);
-        f.cineId = cineID;
-        f.bistro = bistro;
+        CinesFragment f = new CinesFragment();
+        f.peliEstreno = peliculas.get(position).getAsJsonObject();
         getBaseActivity().changeFragment(f);
     }
 
-    private void llenarFechas()
-    {
-        getBaseActivity().getSupportActionBar().setDisplayShowCustomEnabled(true);
-        LayoutInflater inflater = (LayoutInflater) getActivity().getSystemService(Context.LAYOUT_INFLATER_SERVICE);
-        View vi = inflater.inflate(R.layout.spinner_toolbar, null);
-        spinnerFechas = (Spinner) vi.findViewById(R.id.spin);
-        ArrayAdapter<String> spinneradapter = new ArrayAdapter<>(getActivity(), android.R.layout.simple_dropdown_item_1line, fechas);
-        spinnerFechas.setAdapter(spinneradapter);
-        getBaseActivity().getSupportActionBar().setCustomView(vi);
-        spinneradapter.notifyDataSetChanged();
-
-        spinnerFechas.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener()
-        {
-            @Override
-            public void onItemSelected(AdapterView<?> parent, View view, int position, long id)
-            {
-                fechaSeleccionada = position;
-                fetchPeliculas();
-            }
-
-            @Override
-            public void onNothingSelected(AdapterView<?> parent)
-            {
-
-            }
-        });
-    }
 
     class PeliculasAdapter extends BaseAdapter
     {
