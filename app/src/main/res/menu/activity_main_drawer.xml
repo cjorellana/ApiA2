@@ -4,31 +4,31 @@
     <group android:checkableBehavior="single">
         <item
             android:id="@+id/nav_cartelera"
-            android:icon="@drawable/ic_menu_camera"
+            android:icon="@drawable/ticket"
             android:title="Cartelera"/>
         <item
             android:id="@+id/nav_bistro"
-            android:icon="@drawable/ic_menu_gallery"
+            android:icon="@drawable/bistro"
             android:title="Bistro"/>
         <item
             android:id="@+id/nav_estrenos"
-            android:icon="@drawable/ic_menu_slideshow"
+            android:icon="@drawable/estrenos"
             android:title="Estrenos"/>
         <item
             android:id="@+id/nav_proximamente"
-            android:icon="@drawable/ic_menu_manage"
+            android:icon="@drawable/proximos"
             android:title="Próximamente"/>
         <item
             android:id="@+id/nav_promo"
-            android:icon="@drawable/ic_menu_manage"
+            android:icon="@drawable/promo"
             android:title="Promociones"/>
         <item
             android:id="@+id/nav_dulceria"
-            android:icon="@drawable/ic_menu_manage"
+            android:icon="@drawable/dulceria"
             android:title="Dulcería"/>
         <item
             android:id="@+id/nav_ubicaciones"
-            android:icon="@drawable/ic_menu_manage"
+            android:icon="@drawable/ubicaciones"
             android:title="Ubicaciones"/>
 
     </group>

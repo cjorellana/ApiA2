@@ -10,6 +10,7 @@
         android:layout_height="25dp"
         android:layout_alignParentTop="true"
         android:layout_alignParentLeft="true"
+        android:src="@drawable/sala"
         />
     <TextView
         android:id="@+id/txtSala"
@@ -26,15 +27,15 @@
         android:layout_marginLeft="8dp"
         android:layout_width="25dp"
         android:layout_height="25dp"
-        android:layout_below="@+id/txtSala"
-        android:layout_alignParentTop="true"
+        android:layout_below="@+id/imgSala"
+        android:src="@drawable/atributos"
         android:layout_alignParentLeft="true"
         />
     <TextView
         android:id="@+id/txtAtributos"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginTop="8dp"
+        android:layout_marginTop="14dp"
         android:layout_marginLeft="8dp"
         android:layout_below="@+id/txtSala"
         android:layout_toRightOf="@id/imgAtributos"
@@ -46,9 +47,9 @@
         android:layout_height="wrap_content"
         android:layout_margin="10dp"
         android:orientation="horizontal"
-        android:layout_below="@+id/txtAtributos"
-        segmentedgroup:sc_border_width="2dp"
-        segmentedgroup:sc_corner_radius="10dp">
+        android:layout_below="@+id/imgAtributos"
+        segmentedgroup:sc_border_width="1dp"
+        segmentedgroup:sc_corner_radius="5dp">
 <!--
         <RadioButton
             android:id="@+id/button21"

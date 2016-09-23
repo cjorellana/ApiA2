@@ -73,6 +73,7 @@ public class PeliculaFragment extends BaseFragment
             scrSinopsis.setVisibility(View.VISIBLE);
             lstHorarios.setVisibility(View.GONE);
             tabLayout.setVisibility(View.GONE);
+            txtHeader.setText("Sinopsis");
             return;
         }
 
