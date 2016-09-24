@@ -70,11 +70,10 @@ public class MainActivity extends BaseActivity
             f = new ProximosFragment();
         } else if (id == R.id.nav_promo)
         {
-            f = GalleryFragment.newInstance("/Promociones");
-
+            f = GalleryFragment.newInstance("/Promociones", "Promociones");
         } else if (id == R.id.nav_dulceria)
         {
-            f = GalleryFragment.newInstance("/Dulceria");
+            f = GalleryFragment.newInstance("/Dulceria", "Dulcería");
         } else if (id == R.id.nav_ubicaciones)
         {
             f = new UbicacionesFragment();

@@ -47,8 +47,9 @@ public class CinesFragment extends BaseFragment
         JsonObject cine = cines.get(position).getAsJsonObject();
         if (peliEstreno == null)
         {
-            PeliculasCineFragment f = new PeliculasCineFragment();
+            PeliculasCardFragment f = new PeliculasCardFragment();
             f.cineID = cine.get("ID").getAsInt();
+            f.cineNombre = cine.get("Name").getAsString();
             f.titulo = cine.get("Name").getAsString();
             f.bistro = bistro;
             getBaseActivity().changeFragment(f);
@@ -58,6 +59,7 @@ public class CinesFragment extends BaseFragment
             PeliculaFragment f = new PeliculaFragment();
             f.pelicula = peliEstreno;
             f.cineId = cine.get("ID").getAsInt();
+            f.cineNombre = cine.get("Name").getAsString();
             getBaseActivity().changeFragment(f);
         }
 

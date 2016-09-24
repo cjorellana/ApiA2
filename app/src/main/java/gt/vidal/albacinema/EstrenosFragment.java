@@ -45,7 +45,6 @@ public class EstrenosFragment extends BaseFragment
     {
         view = inflater.inflate(R.layout.fragment_estrenos, container, false);
         lstPeliculas = (ListView) view.findViewById(R.id.lstPeliculas);
-        ((TextView)view.findViewById(R.id.txtHeader)).setText(titulo);
         return view;
     }
 
@@ -54,6 +53,12 @@ public class EstrenosFragment extends BaseFragment
     {
         super.onViewCreated(view, savedInstanceState);
         fetchPeliculas();
+    }
+
+    @Override
+    public String getTitle()
+    {
+        return "Estrenos";
     }
 
     private void fetchPeliculas()

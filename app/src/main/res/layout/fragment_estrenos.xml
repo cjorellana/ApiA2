@@ -11,8 +11,8 @@
         android:paddingTop="4dp"
         android:paddingBottom="4dp"
         android:paddingLeft="8dp"
-        android:textAppearance="@style/TextAppearance.AppCompat.Large"
-        android:textSize="16sp"
+        android:textSize="24sp"
+        android:textAppearance="@style/TextAppearance.AppCompat.Body2"
         android:text="Estrenos"/>
     <ListView
         android:id="@+id/lstPeliculas"

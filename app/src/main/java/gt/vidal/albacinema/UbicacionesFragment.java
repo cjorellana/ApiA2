@@ -40,7 +40,6 @@ public class UbicacionesFragment extends BaseFragment
         return v;
     }
 
-
     private void onItemSelected(int position)
     {
         JsonObject cine = cines.get(position).getAsJsonObject();

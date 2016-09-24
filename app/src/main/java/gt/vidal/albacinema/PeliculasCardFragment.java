@@ -2,17 +2,18 @@ package gt.vidal.albacinema;
 
 import android.content.Context;
 import android.graphics.Bitmap;
+import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
-import android.support.v7.app.ActionBar;
+import android.support.v7.widget.LinearLayoutManager;
+import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
-import android.widget.BaseAdapter;
+import android.widget.ImageButton;
 import android.widget.ImageView;
-import android.widget.ListView;
 import android.widget.Spinner;
 import android.widget.TextView;
 
@@ -20,33 +21,44 @@ import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 
-import org.w3c.dom.Text;
-
 import java.util.ArrayList;
 
 /**
- * Created by alejandroalvarado on 14/09/16.
+ * Created by alejandroalvarado on 23/09/16.
  */
-public class PeliculasCineFragment extends BaseFragment
+public class PeliculasCardFragment extends BaseFragment
 {
     public int cineID;
     public String titulo;
 
 
     View view;
-    ListView lstPeliculas;
+    RecyclerView recyclerPeliculas;
     Spinner spinnerFechas;
     ArrayList<String> fechas = new ArrayList<>();
     int fechaSeleccionada = 0;
     private JsonArray peliculas;
     public boolean bistro;
+    private View.OnClickListener clickListener;
+    public String cineNombre;
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState)
     {
-        view = inflater.inflate(R.layout.fragment_peliculas_cine, container, false);
-        lstPeliculas = (ListView) view.findViewById(R.id.lstPeliculas);
+        view = inflater.inflate(R.layout.fragment_peliculas_card, container, false);
+        recyclerPeliculas = (RecyclerView) view.findViewById(R.id.recycler);
         ((TextView)view.findViewById(R.id.txtHeader)).setText(titulo);
+
+        clickListener = v -> {
+            int position = recyclerPeliculas.getChildLayoutPosition(v);
+            PeliculaFragment f = new PeliculaFragment();
+            f.pelicula = peliculas.get(position).getAsJsonObject();
+            f.fecha = fechas.get(fechaSeleccionada);
+            f.cineId = cineID;
+            f.bistro = bistro;
+            f.cineNombre = cineNombre;
+            getBaseActivity().changeFragment(f);
+        };
         return view;
     }
 
@@ -93,8 +105,12 @@ public class PeliculasCineFragment extends BaseFragment
     private void onPeliculasFetched(JsonElement json)
     {
         peliculas = json.getAsJsonArray();
-        lstPeliculas.setAdapter(new PeliculasAdapter(peliculas));
-        lstPeliculas.setOnItemClickListener((parent, view, position, id) -> onItemSelected(position));
+        for (JsonElement p : peliculas)
+        {
+            p.getAsJsonObject().addProperty("Expanded", false);
+        }
+        recyclerPeliculas.setAdapter(new Adapter(peliculas));
+        recyclerPeliculas.setLayoutManager(new LinearLayoutManager(getBaseActivity()));
     }
 
     private void onItemSelected(int position)
@@ -135,57 +151,49 @@ public class PeliculasCineFragment extends BaseFragment
         });
     }
 
-    class PeliculasAdapter extends BaseAdapter
+    class ViewHolderPelicula extends RecyclerView.ViewHolder
     {
-        private final JsonArray data;
-
-        PeliculasAdapter(JsonArray data)
+        private final TextView txtTitulo;
+        private final ImageView imgPelicula;
+        private final TextView txtRating;
+        private final TextView txtGenero;
+        private final TextView txtDuracion;
+        private final TextView txtSinopsis;
+        private final ImageButton btnExpand;
+        public final View view;
+        public ViewHolderPelicula(View view)
         {
-            this.data = data;
-            for (JsonElement p : peliculas)
-            {
-                p.getAsJsonObject().addProperty("Expanded", true);
-            }
+            super(view);
+            this.view = view;
+            txtTitulo = (TextView)view.findViewById(R.id.txtTitulo);
+            imgPelicula = (ImageView) view.findViewById(R.id.imgPelicula);
+            txtSinopsis = (TextView) view.findViewById(R.id.txtSinopsis);
+            txtRating = (TextView) view.findViewById(R.id.txtRating);
+            txtGenero = (TextView) view.findViewById(R.id.txtGenero);
+            txtDuracion = (TextView) view.findViewById(R.id.txtDuracion);
+            btnExpand = (ImageButton) view.findViewById(R.id.btnExpand);
+        }
+    }
+
+    class Adapter extends RecyclerView.Adapter<ViewHolderPelicula> {
+        private JsonArray peliculas;
+
+        Adapter(JsonArray peliculas)
+        {
+            this.peliculas = peliculas;
         }
 
+
         @Override
-        public int getCount()
+        public ViewHolderPelicula onCreateViewHolder(ViewGroup parent, int viewType)
         {
-            return data.size();
+            ViewHolderPelicula vh = new ViewHolderPelicula(getBaseActivity().getLayoutInflater().inflate(R.layout.card_pelicula, parent, false));
+            vh.view.setOnClickListener(clickListener);
+            return vh;
         }
 
-        @Override
-        public Object getItem(int position)
+        public String cutSinopsis(String sinopsis, int maxlength)
         {
-            return data.get(position);
-        }
-
-        @Override
-        public long getItemId(int position)
-        {
-            return 0;
-        }
-
-        @Override
-        public View getView(int position, View convertView, ViewGroup parent)
-        {
-            View v = convertView;
-
-            if(v == null)
-            {
-                LayoutInflater inflater = getBaseActivity().getLayoutInflater();
-                v = inflater.inflate(R.layout.row_pelicula, parent, false);
-            }
-
-            JsonObject pelicula = ((JsonElement) getItem(position)).getAsJsonObject();
-            ((TextView) v.findViewById(R.id.txtTitulo)).setText(pelicula.get("Name").getAsString());
-            ((TextView) v.findViewById(R.id.txtDuracion)).setText(pelicula.get("Duracion").getAsString() + " min.");
-            ((TextView) v.findViewById(R.id.txtGenero)).setText(pelicula.get("Genero").getAsString());
-            ((TextView) v.findViewById(R.id.txtRating)).setText(pelicula.get("Rating").getAsString());
-
-            String sinopsis = pelicula.get("Sinopsis").getAsString();
-
-            int maxlength = 100;
             if (sinopsis.length() > maxlength)
             {
                 sinopsis = sinopsis.substring(0, maxlength);
@@ -194,18 +202,49 @@ public class PeliculasCineFragment extends BaseFragment
                     sinopsis = sinopsis.substring(0, lastSpace);
                 sinopsis += "...";
             }
+            return sinopsis;
+        }
 
-            ((TextView) v.findViewById(R.id.txtSinopsis)).setText(sinopsis);
-            final View tv = v;
+        public void setSinopsis(String sinopsis, ViewHolderPelicula holder, boolean expanded)
+        {
+            sinopsis = expanded ? sinopsis : cutSinopsis(sinopsis, 100);
+            holder.txtSinopsis.setText(sinopsis);
+        }
+
+        @Override
+        public void onBindViewHolder(ViewHolderPelicula holder, int position)
+        {
+            JsonObject pelicula = peliculas.get(position).getAsJsonObject();
+            holder.txtTitulo.setText(pelicula.get("Name").getAsString());
+            holder.txtDuracion.setText(pelicula.get("Duracion").getAsString() + " min.");
+            holder.txtGenero.setText(pelicula.get("Genero").getAsString());
+            holder.txtRating.setText(pelicula.get("Rating").getAsString());
+            setSinopsis(pelicula.get("Sinopsis").getAsString(), holder, pelicula.get("Expanded").getAsBoolean());
+
+
+            holder.btnExpand.setOnClickListener(v ->
+            {
+                boolean expanded = !pelicula.get("Expanded").getAsBoolean();
+                setSinopsis(pelicula.get("Sinopsis").getAsString(), holder, expanded);
+                pelicula.addProperty("Expanded", expanded);
+                holder.btnExpand.setImageResource( expanded ? R.drawable.collapse : R.drawable.expand);
+            });
 
             String imgurl = pelicula.get("Url").getAsString();
             new BackgroundTask<Bitmap>(() -> Images.get(imgurl), (b, e) ->
             {
                 if (e != null) throw new RuntimeException(e);
-                ((ImageView)tv.findViewById(R.id.imgPelicula)).setImageBitmap(b);
+                holder.imgPelicula.setImageBitmap(b);
             }).execute();
-
-            return v;
         }
+
+        @Override
+        public int getItemCount()
+        {
+            return peliculas.size();
+        }
+
+
+
     }
 }

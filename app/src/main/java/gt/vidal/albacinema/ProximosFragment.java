@@ -47,6 +47,12 @@ public class ProximosFragment extends BaseFragment
         lstPeliculas.setOnItemClickListener((parent, view, position, id) -> onItemSelected(position));
     }
 
+    @Override
+    public String getTitle()
+    {
+        return "Próximamente";
+    }
+
     private void onItemSelected(int position)
     {
         PeliculaFragment f = new PeliculaFragment();

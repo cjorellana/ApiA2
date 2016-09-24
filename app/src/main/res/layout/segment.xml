@@ -6,4 +6,5 @@
     style="@style/RadioButton"
     android:minWidth="60dp"
              android:minHeight="30dp"
-    android:textSize="10sp"/>
+    android:textSize="10sp"
+    />

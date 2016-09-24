@@ -40,6 +40,7 @@ public class PeliculaFragment extends BaseFragment
 
     public JsonObject pelicula;
     public String fecha;
+    public String cineNombre = "";
     public int cineId;
 
     private View view;
@@ -59,6 +60,8 @@ public class PeliculaFragment extends BaseFragment
         txtHeader = (TextView) view.findViewById(R.id.txtHeader);
         lstHorarios = (ListView) view.findViewById(R.id.lstHorarios);
         scrSinopsis = (ScrollView) view.findViewById(R.id.scrSinopsis);
+        txtHeader.setText("Horarios " + cineNombre);
+        setRetainInstance(true);
         return view;
     }
 
@@ -182,7 +185,7 @@ public class PeliculaFragment extends BaseFragment
     @Override
     public String getTitle()
     {
-        return "Horarios";
+        return fecha == null ? "" : "Horarios";
     }
 
     private void setupTabs()
@@ -192,18 +195,20 @@ public class PeliculaFragment extends BaseFragment
             @Override
             public void onTabSelected(TabLayout.Tab tab)
             {
-                if (tab.getText().equals("Horarios"))
+                if (tab.getText().equals("Sinopsis"))
                 {
-                    lstHorarios.setVisibility(View.VISIBLE);
-                    scrSinopsis.setVisibility(View.GONE);
-                }
-                else
-                {
+                    txtHeader.setText("Sinopsis");
                     scrSinopsis.setVisibility(View.VISIBLE);
                     lstHorarios.setVisibility(View.GONE);
                 }
+                else
+                {
+                    txtHeader.setText("Horarios " + cineNombre);
+                    lstHorarios.setVisibility(View.VISIBLE);
+                    scrSinopsis.setVisibility(View.GONE);
+                }
 
-                txtHeader.setText(tab.getText());
+
             }
 
             @Override

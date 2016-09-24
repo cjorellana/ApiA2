@@ -34,6 +34,12 @@ public class BistroFragment extends BaseFragment
     }
 
     @Override
+    public String getTitle()
+    {
+        return "Bistro";
+    }
+
+    @Override
     public void onViewCreated(View view, @Nullable Bundle savedInstanceState)
     {
         super.onViewCreated(view, savedInstanceState);
@@ -62,7 +68,7 @@ public class BistroFragment extends BaseFragment
                 return f;
             }
 
-            return GalleryFragment.newInstance("/Bistro");
+            return GalleryFragment.newInstance("/Bistro", "Bistro");
         }
 
         @Override

@@ -18,16 +18,24 @@ import java.util.ArrayList;
 public class GalleryFragment extends BaseFragment
 {
     public String path;
+    public String title;
     private View view;
     private ArrayList<Bitmap> images = new ArrayList<>();
     private FullscreenImageAdapter adapter;
     private ViewPager viewPager;
 
-    public static GalleryFragment newInstance(String path)
+    public static GalleryFragment newInstance(String path, String title)
     {
         GalleryFragment f = new GalleryFragment();
         f.path = path;
+        f.title = title;
         return f;
+    }
+
+    @Override
+    public String getTitle()
+    {
+        return title;
     }
 
     @Override
@@ -41,6 +49,12 @@ public class GalleryFragment extends BaseFragment
     public void onViewCreated(View view, @Nullable Bundle savedInstanceState)
     {
         super.onViewCreated(view, savedInstanceState);
+        if (images.size() > 0)
+        {
+            viewPager.setAdapter(adapter);
+            adapter.notifyDataSetChanged();
+            return;
+        }
         new BackgroundTask<JsonArray>(() -> Api.instance.getJson(path).getAsJsonArray(), (arr, ex) ->
         {
             if (ex != null) throw new RuntimeException(ex);
@@ -52,10 +66,10 @@ public class GalleryFragment extends BaseFragment
     {
         adapter = new FullscreenImageAdapter(getBaseActivity(), images);
         viewPager.setAdapter(adapter);
+
         for (JsonElement imgPath : arr)
         {
             String path = imgPath.getAsString();
-            Log.d("img", path);
             new BackgroundTask<Bitmap>(() -> Api.instance.getImage(path, false), (bmp, ex) ->
             {
                 if (ex != null) throw new RuntimeException(ex);

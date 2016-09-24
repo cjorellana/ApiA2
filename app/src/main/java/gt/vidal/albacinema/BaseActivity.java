@@ -1,5 +1,6 @@
 package gt.vidal.albacinema;
 
+import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentTransaction;
@@ -8,7 +9,7 @@ import android.support.v7.app.AppCompatActivity;
 /**
  * Created by alejandroalvarado on 14/09/16.
  */
-public class BaseActivity extends AppCompatActivity
+public class BaseActivity extends AppCompatActivity implements FragmentManager.OnBackStackChangedListener
 {
     public void changeFragment(BaseFragment f)
     {
@@ -30,4 +31,29 @@ public class BaseActivity extends AppCompatActivity
 
         this.setTitle(f.getTitle());
     }
+
+    @Override
+    public void onBackStackChanged()
+    {
+        Fragment f = getSupportFragmentManager().findFragmentById(R.id.fragment_container);
+        if (f instanceof BaseFragment)
+        {
+            setTitle(((BaseFragment) f).getTitle());
+        }
+    }
+
+    @Override
+    protected void onCreate(Bundle savedInstanceState)
+    {
+        super.onCreate(savedInstanceState);
+        super.getSupportFragmentManager().addOnBackStackChangedListener(this);
+    }
+
+    @Override
+    protected void onDestroy()
+    {
+        super.onDestroy();
+        super.getSupportFragmentManager().removeOnBackStackChangedListener(this);
+    }
+
 }
