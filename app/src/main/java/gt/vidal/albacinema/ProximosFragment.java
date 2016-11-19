@@ -6,6 +6,8 @@ import android.net.Uri;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
+import android.support.v7.widget.LinearLayoutManager;
+import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -23,8 +25,9 @@ import com.google.gson.JsonObject;
 public class ProximosFragment extends BaseFragment
 {
     View view;
-    ListView lstPeliculas;
     private JsonArray peliculas;
+    private RecyclerView recyclerPeliculas;
+    private View.OnClickListener clickListener;
 
     public ProximosFragment()
     {
@@ -43,8 +46,19 @@ public class ProximosFragment extends BaseFragment
     private void onPeliculasFetched(JsonElement json)
     {
         peliculas = json.getAsJsonArray();
-        lstPeliculas.setAdapter(new PeliculasAdapter(peliculas));
-        lstPeliculas.setOnItemClickListener((parent, view, position, id) -> onItemSelected(position));
+        for (JsonElement p : peliculas)
+        {
+            p.getAsJsonObject().addProperty("Expanded", false);
+        }
+        clickListener = v -> {
+            int position = recyclerPeliculas.getChildLayoutPosition(v);
+            PeliculaFragment f = new PeliculaFragment();
+            f.pelicula = peliculas.get(position).getAsJsonObject();
+            f.estreno = true;
+            getBaseActivity().changeFragment(f);
+        };
+        recyclerPeliculas.setAdapter(new PeliculasRecyclerAdapter(peliculas, getBaseActivity(), clickListener));
+        recyclerPeliculas.setLayoutManager(new LinearLayoutManager(getBaseActivity()));
     }
 
     @Override
@@ -53,20 +67,12 @@ public class ProximosFragment extends BaseFragment
         return "Próximamente";
     }
 
-    private void onItemSelected(int position)
-    {
-        PeliculaFragment f = new PeliculaFragment();
-        f.pelicula = peliculas.get(position).getAsJsonObject();
-        f.estreno = true;
-        getBaseActivity().changeFragment(f);
-    }
-
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState)
     {
         view = inflater.inflate(R.layout.fragment_proximos, container, false);
-        lstPeliculas = (ListView) view.findViewById(R.id.lstPeliculas);
+        recyclerPeliculas = (RecyclerView) view.findViewById(R.id.recycler);
         ((TextView)view.findViewById(R.id.txtHeader)).setText("Próximamente");
         return view;
     }
@@ -78,73 +84,4 @@ public class ProximosFragment extends BaseFragment
         fetchPeliculas();
     }
 
-    class PeliculasAdapter extends BaseAdapter
-    {
-        private final JsonArray data;
-
-        PeliculasAdapter(JsonArray data)
-        {
-            this.data = data;
-        }
-
-        @Override
-        public int getCount()
-        {
-            return data.size();
-        }
-
-        @Override
-        public Object getItem(int position)
-        {
-            return data.get(position);
-        }
-
-        @Override
-        public long getItemId(int position)
-        {
-            return 0;
-        }
-
-        @Override
-        public View getView(int position, View convertView, ViewGroup parent)
-        {
-            View v = convertView;
-
-            if(v == null)
-            {
-                LayoutInflater inflater = getBaseActivity().getLayoutInflater();
-                v = inflater.inflate(R.layout.row_pelicula, parent, false);
-            }
-
-            JsonObject pelicula = ((JsonElement) getItem(position)).getAsJsonObject();
-            ((TextView) v.findViewById(R.id.txtTitulo)).setText(pelicula.get("Name").getAsString());
-            ((TextView) v.findViewById(R.id.txtDuracion)).setText(pelicula.get("Duracion").getAsString() + " min.");
-            ((TextView) v.findViewById(R.id.txtGenero)).setText(pelicula.get("Genero").getAsString());
-            ((TextView) v.findViewById(R.id.txtRating)).setText(pelicula.get("Rating").getAsString());
-
-            String sinopsis = pelicula.get("Sinopsis").getAsString();
-
-            int maxlength = 100;
-            if (sinopsis.length() > maxlength)
-            {
-                sinopsis = sinopsis.substring(0, maxlength);
-                int lastSpace = sinopsis.lastIndexOf(' ');
-                if (lastSpace > 0)
-                    sinopsis = sinopsis.substring(0, lastSpace);
-                sinopsis += "...";
-            }
-
-            ((TextView) v.findViewById(R.id.txtSinopsis)).setText(sinopsis);
-            final View tv = v;
-
-            String imgurl = pelicula.get("Url").getAsString();
-            new BackgroundTask<Bitmap>(() -> Images.get(imgurl), (b, e) ->
-            {
-                if (e != null) throw new RuntimeException(e);
-                ((ImageView)tv.findViewById(R.id.imgPelicula)).setImageBitmap(b);
-            }).execute();
-
-            return v;
-        }
-    }
 }

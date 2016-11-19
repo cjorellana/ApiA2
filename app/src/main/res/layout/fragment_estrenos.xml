@@ -14,10 +14,10 @@
         android:textSize="24sp"
         android:textAppearance="@style/TextAppearance.AppCompat.Body2"
         android:text="Estrenos"/>
-    <ListView
-        android:id="@+id/lstPeliculas"
+    <android.support.v7.widget.RecyclerView
+        android:id="@+id/recycler"
         android:layout_width="match_parent"
-        android:layout_height="match_parent">
-    </ListView>
+        android:layout_height="match_parent"
+        android:background="#EBEBEB"/>
 
 </LinearLayout>
