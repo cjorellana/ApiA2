@@ -1,0 +1,3 @@
+Contraseña del keystore: Galileo!
+Key alias: alba
+Key Password: Galileo!
