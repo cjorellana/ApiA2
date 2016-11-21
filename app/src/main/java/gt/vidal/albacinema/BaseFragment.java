@@ -32,6 +32,7 @@ public class BaseFragment extends android.support.v4.app.Fragment
         emptyView = view.findViewById(R.id.emptyView);
         contentView = view.findViewById(R.id.contentView);
         txtEmpty = (TextView) view.findViewById(R.id.txtEmpty);
+        this.setRetainInstance(true);
     }
 
     public void showEmptyView(String emptyMessage)

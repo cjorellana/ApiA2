@@ -2,6 +2,7 @@ package gt.vidal.albacinema;
 
 import android.os.Bundle;
 import android.support.design.widget.NavigationView;
+import android.support.v4.app.Fragment;
 import android.support.v4.view.GravityCompat;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBarDrawerToggle;
@@ -11,6 +12,8 @@ import android.view.MenuItem;
 public class MainActivity extends BaseActivity
         implements NavigationView.OnNavigationItemSelectedListener
 {
+
+    private static final String CURRENT_FRAGMENT_KEY = "actual";
 
     @Override
     protected void onCreate(Bundle savedInstanceState)
@@ -32,7 +35,21 @@ public class MainActivity extends BaseActivity
 
         NavigationView navigationView = (NavigationView) findViewById(R.id.nav_view);
         navigationView.setNavigationItemSelectedListener(this);
-        changeFragment(new CinesFragment(), false);
+
+        BaseFragment showMe = new CinesFragment();
+
+        if (savedInstanceState != null)
+        {
+            BaseFragment old = (BaseFragment) getSupportFragmentManager().getFragment(savedInstanceState, CURRENT_FRAGMENT_KEY);
+
+            if (old != null)
+            {
+                showMe = old;
+            }
+
+        }
+
+        changeFragment(showMe, false, false);
 
     }
 
@@ -84,5 +101,11 @@ public class MainActivity extends BaseActivity
         drawer.closeDrawer(GravityCompat.START);
 
         return true;
+    }
+
+    @Override
+    protected void onSaveInstanceState(Bundle outState) {
+        super.onSaveInstanceState(outState);
+        getSupportFragmentManager().putFragment(outState, CURRENT_FRAGMENT_KEY,currentFragment);
     }
 }

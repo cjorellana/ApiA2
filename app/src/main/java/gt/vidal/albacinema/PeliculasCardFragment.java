@@ -76,6 +76,7 @@ public class PeliculasCardFragment extends BaseFragment
             if (exception != null) {throw new RuntimeException(exception);}
             if (json != null)
             {
+                fechas.clear();
                 for (JsonElement f : json.getAsJsonArray())
                 {
                     fechas.add(f.getAsJsonObject().get("fecha").getAsString());
@@ -122,6 +123,9 @@ public class PeliculasCardFragment extends BaseFragment
 
     private void llenarFechas()
     {
+        if (getBaseActivity() == null)
+            return;
+
         getBaseActivity().getSupportActionBar().setDisplayShowCustomEnabled(true);
         LayoutInflater inflater = (LayoutInflater) getActivity().getSystemService(Context.LAYOUT_INFLATER_SERVICE);
         View vi = inflater.inflate(R.layout.spinner_toolbar, null);
