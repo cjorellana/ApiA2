@@ -1,0 +1,3 @@
+Contraseña del keystore: albaalba
+Key alias: alba
+Key Password: albaalba
