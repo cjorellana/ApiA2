@@ -95,6 +95,10 @@ public class MainActivity extends BaseActivity
         {
             f = new UbicacionesFragment();
         }
+        else if (id == R.id.nav_asientos)
+        {
+            f = new AsientosFragment();
+        }
 
         changeFragment(f, false);
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
@@ -106,6 +110,9 @@ public class MainActivity extends BaseActivity
     @Override
     protected void onSaveInstanceState(Bundle outState) {
         super.onSaveInstanceState(outState);
-        getSupportFragmentManager().putFragment(outState, CURRENT_FRAGMENT_KEY,currentFragment);
+        if (getSupportFragmentManager() == null || currentFragment == null || outState == null || !currentFragment.isAdded())
+            return;
+
+        getSupportFragmentManager().putFragment(outState, CURRENT_FRAGMENT_KEY, currentFragment);
     }
 }
