@@ -43,7 +43,7 @@ public class AsientosView extends View
     private float scaleFactor = 1.0f;
 
 
-    private RectF backgroundRect;
+    private RectF backgroundRect = new RectF();
 
     private ScaleGestureDetector scaleDetector;
     private GestureDetector gestureDetector;
@@ -76,7 +76,13 @@ public class AsientosView extends View
         super(context, attrs);
         scaleDetector = new ScaleGestureDetector(context, new ScaleListener());
         gestureDetector = new GestureDetector(context, new GestureListener());
+
         init();
+    }
+
+    private void onClick()
+    {
+        Log.d("Cines", "Click!!");
     }
 
     private void init()
@@ -100,31 +106,10 @@ public class AsientosView extends View
     protected void onMeasure(int widthMeasureSpec, int heightMeasureSpec)
     {
         int widthMode = MeasureSpec.getMode(widthMeasureSpec);
-        int widthSize = MeasureSpec.getSize(widthMeasureSpec);
+        int w = MeasureSpec.getSize(widthMeasureSpec);
         int heightMode = MeasureSpec.getMode(heightMeasureSpec);
-        int heightSize = MeasureSpec.getSize(heightMeasureSpec);
+        int h = MeasureSpec.getSize(heightMeasureSpec);
 
-
-       /* if (rowHeight != 0 && columnWidth != 0)
-        {
-            super.onMeasure(MeasureSpec.makeMeasureSpec((int)Math.ceil(drawingWidth + padx * 2), MeasureSpec.EXACTLY),
-                    MeasureSpec.makeMeasureSpec((int)Math.ceil(drawingHeight + pady * 2), MeasureSpec.EXACTLY));
-        }
-        else
-        {*/
-            super.onMeasure(widthMeasureSpec, heightMeasureSpec);
-        //}
-
-
-
-    }
-
-    @Override
-    protected void onSizeChanged(int w, int h, int oldw, int oldh)
-    {
-        super.onSizeChanged(w, h, oldw, oldh);
-
-        Log.d("Cines", "Old " + oldw + " " + oldh + " new " + w + " " + h);
         if (w > h)
         {
             drawingHeight = h - pady * 2;
@@ -143,33 +128,20 @@ public class AsientosView extends View
             drawingHeight= (layoutData.getRowCount() + 1) * columnWidth;
         }
 
-
-
         //noinspection SuspiciousNameCombination
-
         this.rowHeight = columnWidth;
-
-        this.backgroundRect = new RectF(padx, pady, drawingWidth + padx, drawingHeight + pady);
-
+        this.backgroundRect.set(padx, pady, drawingWidth + padx, drawingHeight + pady);
         this.seatSize = columnWidth * 0.8f;
 
-        Log.d("Cines", "sizeC " + drawingWidth +  " " + drawingHeight);
-
-        Handler handler = new Handler();
-        handler.post(new Runnable() {
-
-            @Override
-            public void run() {
-                requestLayout();
-            }
-        });
-
+        setMeasuredDimension((int)Math.ceil(drawingWidth  + padx * 2),
+                             (int)Math.ceil(drawingHeight + pady * 2));
     }
+
 
     @Override
     public boolean onTouchEvent(MotionEvent event) {
 
-
+        super.onTouchEvent(event);
         switch (event.getAction() & MotionEvent.ACTION_MASK)
         {
             case MotionEvent.ACTION_DOWN:
@@ -209,6 +181,10 @@ public class AsientosView extends View
                 mode = NONE;
                 dragged = false;
 
+                if (event.getX() - previousTranslateX == startX && event.getY() - previousTranslateY == startY)
+                {
+                    Log.d("Cines","tap!");
+                }
                 //All fingers went up, so let's save the value of translateX and translateY into previousTranslateX and
                 //previousTranslate
                 previousTranslateX = translateX;
@@ -247,10 +223,14 @@ public class AsientosView extends View
         super.onDraw(canvas);
         canvas.save();
 
-/*
-        translateX = clamp(translateX, drawingWidth * (1/scaleFactor - 1)/2, drawingWidth * (1 - 1/scaleFactor)/2);
-        translateY = clamp(translateY, drawingHeight* (1/scaleFactor - 1)/2, drawingHeight * (1 - 1/scaleFactor)/2);
-*/
+        float w = drawingWidth  + padx * 4;
+        float h = drawingHeight + pady * 4;
+
+        Log.d("Cines", translateX +"," + translateY + " - " + translateX / scaleFactor + "," + translateY / scaleFactor);
+
+        translateX = clamp(translateX, w * (1/scaleFactor - 1), w * (1 - 1/scaleFactor));
+        translateY = clamp(translateY, h* (1/scaleFactor - 1), h * (1 - 1/scaleFactor));
+
 
 
         canvas.scale(scaleFactor, scaleFactor, mid.x, mid.y);
