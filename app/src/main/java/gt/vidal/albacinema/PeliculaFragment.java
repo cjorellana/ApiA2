@@ -19,6 +19,7 @@ import android.widget.BaseAdapter;
 import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.RadioButton;
+import android.widget.RadioGroup;
 import android.widget.ScrollView;
 import android.widget.Spinner;
 import android.widget.TextView;
@@ -270,17 +271,32 @@ public class PeliculaFragment extends BaseFragment
                     .setText(horario.get("Attributes").getAsString().replace(";", " | "));
 
             SegmentedGroup sg = (SegmentedGroup) v.findViewById(R.id.sgmHoras);
+
+            int i = 0;
             for (JsonElement h: horario.get("Horas").getAsJsonArray())
             {
                 RadioButton button = (RadioButton) inflater.inflate(R.layout.segment, null);
                 String hora = h.getAsJsonObject().get("hora").getAsString();
                 hora = hora.substring(0, hora.lastIndexOf(":"));
                 button.setText(hora);
-                button.setEnabled(false);
                 sg.addView(button);
                 sg.updateBackground();
-            }
+                final int horarioIndex = i++;
 
+                button.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        BoletosFragment f = new BoletosFragment();
+                        f.pelicula = pelicula;
+                        f.fecha = fecha;
+                        f.cineId = cineId;
+                        f.cineNombre = cineNombre;
+                        f.horario = horario;
+                        f.horarioSeleccionado = horarioIndex;
+                        getBaseActivity().changeFragment(f);
+                    }
+                });
+            }
             return v;
         }
     }
