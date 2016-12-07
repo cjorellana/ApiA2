@@ -10,6 +10,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.BaseAdapter;
+import android.widget.Button;
 import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.ListView;
@@ -20,6 +21,7 @@ import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 
 import java.net.URLEncoder;
+import java.util.Random;
 
 import static android.R.attr.button;
 import static gt.vidal.albacinema.Images.get;
@@ -41,12 +43,17 @@ public class BoletosFragment extends BaseFragment {
     public int cineId;
     public JsonObject horario;
     public int horarioSeleccionado;
+    public int idFuncion;
 
     private View view;
+    private Button btnContinuar;
+    private JsonArray boletos;
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         view = inflater.inflate(R.layout.fragment_boletos, container, false);
+        btnContinuar = (Button) view.findViewById(R.id.btnContinuar);
+        this.btnContinuar.setEnabled(false);
         setRetainInstance(true);
         return view;
     }
@@ -93,8 +100,46 @@ public class BoletosFragment extends BaseFragment {
 
     private void onBoletosFetched(JsonArray arr)
     {
-        ListView lstBoletos = (ListView) view.findViewById(R.id.lstBoletos);
-        lstBoletos.setAdapter(new BoletosFragment.BoletosAdapter(arr));
+        this.boletos = arr;
+        if (arr.size() > 0)
+        {
+            btnContinuar.setEnabled(true);
+
+            for (JsonElement b : this.boletos)
+            {
+                JsonObject boleto = b.getAsJsonObject();
+                boleto.addProperty("Cantidad", 0);
+            }
+
+            btnContinuar.setOnClickListener((v) ->
+            {
+                continuar();
+            });
+
+            ListView lstBoletos = (ListView) view.findViewById(R.id.lstBoletos);
+            lstBoletos.setAdapter(new BoletosFragment.BoletosAdapter(arr));
+
+        }
+    }
+
+    private void continuar()
+    {
+        for (JsonElement b : this.boletos)
+        {
+            JsonObject boleto = b.getAsJsonObject();
+            StringBuilder path = new StringBuilder("/boletos/agregar/");
+            path.append(1000 + new Random().nextInt(999));
+            path.append("/");
+            path.append(cineId);
+            path.append("/");
+            path.append(idFuncion);
+            path.append("/");
+            path.append(boleto.get("").getAsString());
+            new BackgroundTask<JsonElement>(()-> Api.instance.getJson(path.toString()), (json, ex) ->
+            {
+
+            }).execute();
+        }
     }
 
     @Override
@@ -138,8 +183,8 @@ public class BoletosFragment extends BaseFragment {
             }
 
             JsonObject tipoBoleto = ((JsonElement) getItem(position)).getAsJsonObject();
-            ((TextView)v.findViewById(R.id.txtTipo)).setText(tipoBoleto.get("Categoria").getAsString());
-            float precio = tipoBoleto.get("Precio").getAsFloat();
+            ((TextView)v.findViewById(R.id.txtTipo)).setText(tipoBoleto.get("categoria").getAsString());
+            float precio = tipoBoleto.get("precio").getAsFloat();
 
             ((TextView)v.findViewById(R.id.txtPrecio)).setText("Q." + String.format(java.util.Locale.US,"%.2f", precio));
             TextView txtCantidad = (TextView)v.findViewById(R.id.txtCantidad);
@@ -150,35 +195,38 @@ public class BoletosFragment extends BaseFragment {
             ImageButton btnMenos = (ImageButton)v.findViewById(R.id.btnMenos);
             ImageButton btnMas = (ImageButton)v.findViewById(R.id.btnMas);
 
-            btnMenos.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View v) {
-                    int cantidad = Integer.parseInt(txtCantidad.getText().toString());
-                    if(cantidad != 0){
-                        txtCantidad.setText(String.valueOf(--cantidad));
+            btnMenos.setOnClickListener(v1 -> {
+                int cantidad = Integer.parseInt(txtCantidad.getText().toString());
+                if(cantidad != 0){
+                    txtCantidad.setText(String.valueOf(--cantidad));
 
-                        float total = Float.parseFloat(txtTotal.getText().toString());
-                        total -= precio;
-                        txtTotal.setText(String.format(java.util.Locale.US,"%.2f", total));
-                    }
+                    float total = Float.parseFloat(txtTotal.getText().toString());
+                    total -= precio;
+                    txtTotal.setText(String.format(java.util.Locale.US,"%.2f", total));
+                    setCantidad(position, cantidad);
                 }
+
             });
 
-            btnMas.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View v) {
-                    int cantidad = Integer.parseInt(txtCantidad.getText().toString());
-                    if(cantidad != 10){
-                        txtCantidad.setText(String.valueOf(++cantidad));
+            btnMas.setOnClickListener(v12 -> {
+                int cantidad = Integer.parseInt(txtCantidad.getText().toString());
+                if(cantidad != 10){
+                    txtCantidad.setText(String.valueOf(++cantidad));
 
-                        float total = Float.parseFloat(txtTotal.getText().toString());
-                        total += precio;
-                        txtTotal.setText(String.format(java.util.Locale.US,"%.2f", total));
-                    }
+                    float total = Float.parseFloat(txtTotal.getText().toString());
+                    total += precio;
+                    txtTotal.setText(String.format(java.util.Locale.US,"%.2f", total));
+                    setCantidad(position, cantidad);
                 }
+
             });
 
             return v;
+        }
+
+        void setCantidad(int index, int cantidad)
+        {
+            data.get(index).getAsJsonObject().addProperty("Cantidad", cantidad);
         }
     }
 }

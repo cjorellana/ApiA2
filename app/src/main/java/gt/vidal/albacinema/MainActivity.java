@@ -20,8 +20,8 @@ public class MainActivity extends BaseActivity
     {
         super.onCreate(savedInstanceState);
 
-        //Api.instance = new Api("http://cines.softwarecj.com");
-        Api.instance = new Api("https://ccn.albacinema.com.gt");
+        Api.instance = new Api("http://cines.softwarecj.com");
+        //Api.instance = new Api("https://ccn.albacinema.com.gt");
         Images.init();
 
         setContentView(R.layout.activity_main);

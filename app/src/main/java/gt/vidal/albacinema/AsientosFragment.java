@@ -17,6 +17,7 @@ import com.google.gson.JsonParser;
  */
 public class AsientosFragment extends BaseFragment
 {
+    public int numberOfSeats;
 
 
     public AsientosFragment()

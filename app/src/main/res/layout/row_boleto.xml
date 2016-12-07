@@ -52,7 +52,7 @@
             android:scaleType="fitCenter"
             android:adjustViewBounds="true"
             android:layout_toLeftOf="@+id/txtCantidad"
-            android:src="@drawable/minus"
+            android:src="@drawable/bistro"
             android:background="#0000"/>
         <TextView
             android:id="@+id/txtCantidad"
@@ -73,7 +73,7 @@
             android:scaleType="fitCenter"
             android:adjustViewBounds="true"
             android:layout_toRightOf="@+id/txtCantidad"
-            android:src="@drawable/plus"
+            android:src="@drawable/bistro"
             android:background="#0000"/>
 
     </RelativeLayout>
