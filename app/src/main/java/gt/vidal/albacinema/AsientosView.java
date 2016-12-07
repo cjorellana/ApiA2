@@ -5,12 +5,12 @@ import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Canvas;
 import android.graphics.Color;
+import android.graphics.Matrix;
 import android.graphics.Paint;
 import android.graphics.PointF;
+import android.graphics.Rect;
 import android.graphics.RectF;
-import android.graphics.drawable.BitmapDrawable;
 import android.os.Build;
-import android.os.Handler;
 import android.util.AttributeSet;
 import android.util.Log;
 import android.view.GestureDetector;
@@ -65,6 +65,9 @@ public class AsientosView extends View
     private float previousTranslateX = 0f;
     private float previousTranslateY = 0f;
     private Paint redPaint;
+    private Rect canvasClipBounds;
+    private float[] values = new float[9];
+
 
     public AsientosView(Context context)
     {
@@ -80,9 +83,40 @@ public class AsientosView extends View
         init();
     }
 
-    private void onClick()
+    private void onClick(float x, float y)
     {
-        Log.d("Cines", "Click!!");
+        float realX = (x-values[2])/scaleFactor;
+        float realY = (y-values[5])/scaleFactor;
+
+        int col = (int) Math.floor((realX - padx*2) / (columnWidth));
+        int row = (int) Math.floor((realY - pady*2) / (rowHeight));
+
+        if (col < 0 || col >= layoutData.getColumnCount() || row < 0 || row >= layoutData.getRowCount())
+            return;
+
+        //Log.d("Coords", row + ", " + col);
+
+        JsonObject rowObj = this.layoutData.getRowOrNull(row);
+
+        if (rowObj == null)
+            return;
+
+        JsonArray seats = rowObj.get("Seats").getAsJsonArray();
+        JsonElement seat = seats.get(col);
+
+        if (seat == null || seat.isJsonNull())
+            return;
+
+        JsonObject seatObj = seat.getAsJsonObject();
+        Log.d("Asiento", rowObj.get("PhysicalName").getAsString() + "-" + seatObj.get("Id").getAsString());
+
+        if (seatObj.get("Status").getAsString().equals("Empty"))
+            seatObj.addProperty("Status", "Sold");
+        else if (seatObj.get("Status").getAsString().equals("Sold"))
+            seatObj.addProperty("Status", "Empty");
+
+        this.invalidate();
+
     }
 
     private void init()
@@ -181,9 +215,10 @@ public class AsientosView extends View
                 mode = NONE;
                 dragged = false;
 
-                if (event.getX() - previousTranslateX == startX && event.getY() - previousTranslateY == startY)
+                if (event.getX() - previousTranslateX == startX &&
+                    event.getY() - previousTranslateY == startY)
                 {
-                    Log.d("Cines","tap!");
+                    onClick(event.getX(), event.getY());
                 }
                 //All fingers went up, so let's save the value of translateX and translateY into previousTranslateX and
                 //previousTranslate
@@ -221,20 +256,18 @@ public class AsientosView extends View
     protected void onDraw(Canvas canvas)
     {
         super.onDraw(canvas);
+        canvasClipBounds = canvas.getClipBounds();
         canvas.save();
-
         float w = drawingWidth  + padx * 4;
         float h = drawingHeight + pady * 4;
-
-        Log.d("Cines", translateX +"," + translateY + " - " + translateX / scaleFactor + "," + translateY / scaleFactor);
 
         translateX = clamp(translateX, w * (1/scaleFactor - 1), w * (1 - 1/scaleFactor));
         translateY = clamp(translateY, h* (1/scaleFactor - 1), h * (1 - 1/scaleFactor));
 
-
-
         canvas.scale(scaleFactor, scaleFactor, mid.x, mid.y);
         canvas.translate(translateX / scaleFactor, translateY / scaleFactor);
+
+        canvas.getMatrix().getValues(values);
 
         drawBackground(canvas);
         drawSeats(canvas);

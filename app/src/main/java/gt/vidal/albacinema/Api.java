@@ -37,6 +37,7 @@ public class Api
 
     public JsonElement getJson(String path) throws Exception
     {
+        Log.d("path", path);
         StringBuffer chaine = new StringBuffer("");
         URL url = new URL(this.url + path);
         HttpURLConnection connection = (HttpURLConnection)url.openConnection();
