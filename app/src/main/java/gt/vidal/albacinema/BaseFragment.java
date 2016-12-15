@@ -28,6 +28,7 @@ public class BaseFragment extends android.support.v4.app.Fragment
     public void onViewCreated(View view, @Nullable Bundle savedInstanceState)
     {
         super.onViewCreated(view, savedInstanceState);
+        setRetainInstance(getParentFragment() == null);
         getBaseActivity().getSupportActionBar().setDisplayShowCustomEnabled(false);
         emptyView = view.findViewById(R.id.emptyView);
         contentView = view.findViewById(R.id.contentView);

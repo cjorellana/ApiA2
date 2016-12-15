@@ -15,6 +15,7 @@ import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
@@ -43,11 +44,12 @@ public class BoletosFragment extends BaseFragment {
     public int cineId;
     public JsonObject horario;
     public int horarioSeleccionado;
-    public int idFuncion;
 
     private View view;
     private Button btnContinuar;
     private JsonArray boletos;
+    private String idFuncion;
+    private int llamadasPendientes;
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
@@ -62,8 +64,15 @@ public class BoletosFragment extends BaseFragment {
     public void onViewCreated(View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
 
+
+        idFuncion = horario.get("Horas").getAsJsonArray().get(horarioSeleccionado).getAsJsonObject().get("IDFuncion").getAsString();
         llenarHeader();
-        fetchBoletos();
+
+        if (boletos == null)
+            fetchBoletos();
+        else
+            onBoletosFetched(boletos);
+
     }
 
     private void llenarHeader(){
@@ -89,7 +98,7 @@ public class BoletosFragment extends BaseFragment {
     {
         StringBuilder path = new StringBuilder("/boletos/precio/");
         path.append(cineId + "/");
-        path.append(horario.get("Horas").getAsJsonArray().get(horarioSeleccionado).getAsJsonObject().get("IDFuncion").getAsString());
+        path.append(idFuncion);
 
         new BackgroundTask<JsonArray>(() -> Api.instance.getJson(path.toString()).getAsJsonArray(), (arr, e) ->
         {
@@ -124,6 +133,21 @@ public class BoletosFragment extends BaseFragment {
 
     private void continuar()
     {
+        llamadasPendientes = 0;
+        for (JsonElement b : this.boletos)
+        {
+            JsonObject boleto = b.getAsJsonObject();
+
+            if (boleto.get("Cantidad").getAsInt() > 0)
+                llamadasPendientes++;
+        }
+
+        if (llamadasPendientes == 0)
+        {
+            Toast.makeText(getBaseActivity(), "Debe seleccionar al menos un boleto", Toast.LENGTH_SHORT).show();
+            return;
+        }
+
         for (JsonElement b : this.boletos)
         {
             JsonObject boleto = b.getAsJsonObject();
@@ -134,10 +158,24 @@ public class BoletosFragment extends BaseFragment {
             path.append("/");
             path.append(idFuncion);
             path.append("/");
-            path.append(boleto.get("").getAsString());
+            path.append(boleto.get("tipo").getAsString());
+            path.append("/");
+            path.append(boleto.get("Cantidad").getAsInt());
+            path.append("/");
+            path.append(boleto.get("precio").getAsInt());
             new BackgroundTask<JsonElement>(()-> Api.instance.getJson(path.toString()), (json, ex) ->
             {
-
+                if (ex != null) throw new RuntimeException(ex);
+                if (json != null)
+                {
+                     llamadasPendientes--;
+                     if (llamadasPendientes == 0)
+                     {
+                        AsientosFragment f = new AsientosFragment();
+                        f.json = json.getAsJsonObject();
+                        getBaseActivity().changeFragment(f);
+                     }
+                }
             }).execute();
         }
     }

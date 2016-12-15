@@ -51,6 +51,7 @@ public class Api
         while ((line = rd.readLine()) != null) {
             chaine.append(line);
         }
+        Log.d("Json", chaine.toString());
         return parser.parse(chaine.toString());
     }
 

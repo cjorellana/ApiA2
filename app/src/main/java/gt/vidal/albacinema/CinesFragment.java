@@ -37,6 +37,8 @@ public class CinesFragment extends BaseFragment
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState)
     {
+        /*if (getParentFragment() == null)
+            setRetainInstance(true);*/
         view = inflater.inflate(R.layout.fragment_cines, container, false);
         lstCines = (ListView) view.findViewById(R.id.lstCines);
         return view;

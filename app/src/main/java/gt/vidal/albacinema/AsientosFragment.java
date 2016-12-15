@@ -8,6 +8,7 @@ import android.view.View;
 import android.view.ViewGroup;
 
 import com.google.gson.GsonBuilder;
+import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 
@@ -18,11 +19,13 @@ import com.google.gson.JsonParser;
 public class AsientosFragment extends BaseFragment
 {
     public int numberOfSeats;
+    public JsonObject json;
 
 
     public AsientosFragment()
     {
         // Required empty public constructor
+        //setRetainInstance(true);
     }
 
 
@@ -34,7 +37,8 @@ public class AsientosFragment extends BaseFragment
         View v = inflater.inflate(R.layout.fragment_asientos, container, false);
 
         AsientosView av = (AsientosView) v.findViewById(R.id.view_asientos);
-        av.layoutData = new SeatLayoutData(new JsonParser().parse(data).getAsJsonObject());
+        //av.layoutData = new SeatLayoutData(new JsonParser().parse(data).getAsJsonObject());
+        av.setLayoutData(new SeatLayoutData(json));
 
         return v;
     }

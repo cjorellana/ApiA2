@@ -62,7 +62,7 @@ public class PeliculaFragment extends BaseFragment
         lstHorarios = (ListView) view.findViewById(R.id.lstHorarios);
         scrSinopsis = (ScrollView) view.findViewById(R.id.scrSinopsis);
         txtHeader.setText("Horarios " + cineNombre);
-        setRetainInstance(true);
+        //setRetainInstance(true);
         return view;
     }
 

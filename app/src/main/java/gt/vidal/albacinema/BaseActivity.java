@@ -38,6 +38,10 @@ public class BaseActivity extends AppCompatActivity implements FragmentManager.O
         trans.commit ();
 
         this.setTitle(f.getTitle());
+
+        /*if (currentFragment != null)
+            currentFragment.setRetainInstance(false);*/
+
         currentFragment = f;
     }
 

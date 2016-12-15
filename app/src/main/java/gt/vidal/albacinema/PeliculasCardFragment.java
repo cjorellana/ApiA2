@@ -45,6 +45,7 @@ public class PeliculasCardFragment extends BaseFragment
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState)
     {
+        //setRetainInstance(true);
         view = inflater.inflate(R.layout.fragment_peliculas_card, container, false);
         recyclerPeliculas = (RecyclerView) view.findViewById(R.id.recycler);
         ((TextView)view.findViewById(R.id.txtHeader)).setText(titulo);

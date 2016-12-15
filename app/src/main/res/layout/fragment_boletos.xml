@@ -103,7 +103,7 @@
             android:layout_height="25dp"
             android:layout_below="@+id/txtAtributos"
             android:layout_toRightOf="@+id/imgContainer"
-            android:src="@drawable/bistro"
+            android:src="@drawable/watch"
             />
     </RelativeLayout>
 

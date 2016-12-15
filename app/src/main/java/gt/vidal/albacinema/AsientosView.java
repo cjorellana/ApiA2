@@ -22,6 +22,9 @@ import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 
+import java.util.LinkedList;
+import java.util.Queue;
+
 /**
  * Created by alejandroalvarado on 23/11/16.
  */
@@ -32,7 +35,7 @@ public class AsientosView extends View
 
     private Paint backgroundPaint;
 
-    public SeatLayoutData layoutData;
+    private SeatLayoutData layoutData;
 
     private float rowHeight = 0;
     private float columnWidth = 0;
@@ -67,6 +70,7 @@ public class AsientosView extends View
     private Paint redPaint;
     private Rect canvasClipBounds;
     private float[] values = new float[9];
+    private Queue<JsonObject> reservados = new LinkedList<>();
 
 
     public AsientosView(Context context)
@@ -111,9 +115,11 @@ public class AsientosView extends View
         Log.d("Asiento", rowObj.get("PhysicalName").getAsString() + "-" + seatObj.get("Id").getAsString());
 
         if (seatObj.get("Status").getAsString().equals("Empty"))
-            seatObj.addProperty("Status", "Sold");
-        else if (seatObj.get("Status").getAsString().equals("Sold"))
-            seatObj.addProperty("Status", "Empty");
+        {
+            seatObj.addProperty("Status", "Reserved");
+            reservados.poll().addProperty("Status", "Empty");
+            reservados.add(seatObj);
+        }
 
         this.invalidate();
 
@@ -271,7 +277,6 @@ public class AsientosView extends View
 
         drawBackground(canvas);
         drawSeats(canvas);
-        canvas.drawCircle(mid.x, mid.y, 5, redPaint);
 
         canvas.restore();
     }
@@ -309,9 +314,9 @@ public class AsientosView extends View
     {
         Bitmap bm = bmapGray;
 
-        if (status.equals("Sold"))
+        if (status.equals("Reserved"))
             bm = bmapGreen;
-        else if (status.equals("Reserved"))
+        else if (status.equals("Sold"))
             bm = bmapRed;
 
         RectF rect = new RectF(x, y, x + seatSize, y + seatSize);
@@ -334,6 +339,33 @@ public class AsientosView extends View
         else
         {
             canvas.drawRect(backgroundRect, backgroundPaint);
+        }
+    }
+
+    public void setLayoutData(SeatLayoutData layoutData)
+    {
+        this.layoutData = layoutData;
+
+        for (int rowIndex = 0; rowIndex < layoutData.getRowCount(); rowIndex++)
+        {
+            JsonObject row = this.layoutData.getRowOrNull(rowIndex);
+
+            if (row == null)
+                continue;
+
+            JsonArray seats = row.get("Seats").getAsJsonArray();
+
+            for (int colIndex = 0; colIndex < layoutData.getColumnCount(); colIndex++)
+            {
+                JsonElement seatElement = seats.get(colIndex);
+                if (seatElement.isJsonNull())
+                    continue;
+                JsonObject seat = seatElement.getAsJsonObject();
+
+                if (seat.get("Status").getAsString().equals("Reserved"))
+                    reservados.add(seat);
+
+            }
         }
     }
 
