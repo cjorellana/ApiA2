@@ -2,16 +2,11 @@ package gt.vidal.albacinema;
 
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
-import android.util.Log;
 
-import com.google.gson.Gson;
-import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonParser;
-import com.google.gson.stream.JsonReader;
 
 import java.io.BufferedReader;
-import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
@@ -60,6 +55,7 @@ public class Api
 
     public Bitmap getImage(String path, boolean useBaseUrl) throws Exception
     {
+        path = path.replace(" ","%20");
         String address = useBaseUrl ? this.url + path : path;
         URL url = new URL(address);
         HttpURLConnection connection = (HttpURLConnection)url.openConnection();
